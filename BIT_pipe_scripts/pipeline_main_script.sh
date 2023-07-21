@@ -20,15 +20,12 @@ BIT_id=./BIT_pipe_scripts/BIT_id_fun.sh
 processing=./BIT_pipe_scripts/processing_fun.sh
 pygenometracks=./BIT_pipe_scripts/pygenometracks_fun.sh
 converter=./BIT_pipe_scripts/converter_fun.sh
+filters=./BIT_pipe_scripts/filters_fun.sh
+transcriptome_merge=./BIT_pipe_scripts/transcriptome_merge_fun.sh
+dsbome=./BIT_pipe_scripts/dsbome_fun.sh
+transcriptome_alignment_str=./BIT_pipe_scripts/transcriptome_alignment_str_fun.sh
 
-#pipeline_usage () {}
-#give options to transcriptome assembly for annotation and genome indexing. need to alter this file and the function one
-#transcriptome annotation not finnished
-#need to fix the processer_fun for multilple formats
-#pygenometracks not finished
-#fix file converter and add
-
-functions_usage () { echo -e "\tFUNCTION NAME\tDESCRIPTION\n\tfastqdump\tUsed for downloading files\n\tfastqc\tUsed for analysing the quality of fastq files\n\tmultiqc\tUsed for analysing the quality of multiple processes, namely transcriptome assembly\n\tgenome_indexing\tUsed for indexing the the genome\n\ttranscriptome_assembly_str\tUsed for transcriptome assembly, by using stringtie pipeline\n\talign_flagstat\tUsed to see some statistics about the alignment using samtools flagstat\n\ttranscriptome_annotation\tUsed for annotate the transcriptome file and compare with reference annotation, using gffcompare\n\tBIT_id\tUsed for identification of BIT locations\n\tprocessing\tUsed for processing multiple files\n\tdsb_characterization\tUsed for characterize DSB files\n\tpygenometracks\tUsed to plot multilple tracks into a image (similar to Genome Browser)\n\tconverter\tUsed to convert files into other formats\n\ttranscriptome_merge\tUsed for merging multilple transcriptomes created with Stringtie into a single transcriptome file (GTF)" 1>&2; }
+functions_usage () { echo -e "\tFUNCTION NAME\tDESCRIPTION\n\tfastqdump\tUsed for downloading files\n\tfastqc\tUsed for analysing the quality of fastq files\n\tmultiqc\tUsed for analysing the quality of multiple processes, namely transcriptome assembly\n\tgenome_indexing\tUsed for indexing the the genome\n\ttranscriptome_assembly_str\tUsed for transcriptome assembly, by using stringtie pipeline\n\talign_flagstat\tUsed to see some statistics about the alignment using samtools flagstat\n\ttranscriptome_annotation\tUsed for annotate the transcriptome file and compare with reference annotation, using gffcompare\n\tBIT_id\tUsed for identification of BIT locations\n\tprocessing\tUsed for processing multiple files\n\tdsb_characterization\tUsed for characterize DSB files\n\tpygenometracks\tUsed to plot multilple tracks into a image (similar to Genome Browser)\n\tconverter\tUsed to convert files into other formats\n\ttranscriptome_merge\tUsed for merging multilple transcriptomes created with Stringtie into a single transcriptome file (GTF)\n\tfilters\tUsed to filter out the BIT candidates results based on the user desire\n\tdsbome\tUsed to create the DSBome\n\ttranscriptome_alignment_str\tUsed to align RNAseq files to a transcriptome, using stringtie" 1>&2; }
 
 echo -e "Hello, you are running the Pipeline for BIT (Break-Induced Transcription) location. Multiple functions are available, some of which aren't directly related to it."
 echo -e "\n------------------------------------------------------------\n"
@@ -151,33 +148,33 @@ while [ "$step_b" != "true" ]; do
 		tail -n 3 $tmp_file >> $report_file
 		rm $tmp_file
 		step_b=true
+	elif [ "$step" == "filters" ];
+	then
+		{ time $filters $report_file; } 2>&1 | tee $tmp_file
+		echo -e "\n" >> $report_file
+		tail -n 3 $tmp_file >> $report_file
+		rm $tmp_file
+		step_b=true
 	elif [ "$step" == "transcriptome_merge" ];
 	then
-		echo -e "\nHere we go:\n"
-		echo -e "\ttranscriptome_merge\tUsed for merging multilple transcriptomes created with Stringtie into a single transcriptome file (GTF)"
-		read -r -p $'\t'"Which transcriptomes you want to merge? They need to be space separated ( ) " transcriptomes
-		read -r -p $'\t'"Do you have a transcriptome annotation to give? [Y/n] " decision
-		case $decision in
-			[yY]|[yY][eE][sS]|"")
-				read -r -p $'\t'"Thank you. Which is the transcriptome annotation? It needs to be a GTF file " annotation_ref
-				genome="-G "$annotation_ref
-				;;
-			[nN]|[nN][oO])
-				echo -e "\tThank you. No annotation will be used."
-				genome=""
-				;;
-			*)
-				echo -e "\tSorry, I can't understand your option. The program is going to terminate."
-				exit
-		esac
-		read -r -p $'\t'"What name would you like to save your merged transcript? " output
-		if [ -z $output ];
-		then
-			read -r -p $'\t'"No output was given, this will be terminated."
-			exit
-		fi
-		echo udocker -q run -v=$PWD:$PWD -w=$PWD stringtie stringtie --merge $genome -o $output $transcriptomes
-		udocker -q run -v=$PWD:$PWD -w=$PWD stringtie stringtie --merge $genome -o $output $transcriptomes
+		{ time $transcriptome_merge $report_file; } 2>&1 | tee $tmp_file
+		echo -e "\n" >> $report_file
+		tail -n 3 $tmp_file >> $report_file
+		rm $tmp_file
+		step_b=true
+	elif [ "$step" == "dsbome" ];
+	then
+		{ time $dsbome $report_file; } 2>&1 | tee $tmp_file
+		echo -e "\n" >> $report_file
+		tail -n 3 $tmp_file >> $report_file
+		rm $tmp_file
+		step_b=true
+	elif [ "$step" == "transcriptome_alignment_str" ];
+	then
+		{ time $transcriptome_alignment_str $report_file; } 2>&1 | tee $tmp_file
+		echo -e "\n" >> $report_file
+		tail -n 3 $tmp_file >> $report_file
+		rm $tmp_file
 		step_b=true
 	else
 		echo -e "\n\tThis option is not available or badly writen. Please read the available functions and try again\n"

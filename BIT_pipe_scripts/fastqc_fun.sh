@@ -40,5 +40,5 @@ else
 	out="-o "
 	out+=$output
 fi
-    echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD fastqc fastqc $files $out $core"
+    echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD fastqc fastqc $files $out $core" >> $1
 	udocker -q run -v=$PWD:$PWD -w=$PWD fastqc fastqc $files $out $core

@@ -86,7 +86,7 @@ read -r -p $'\t'"Will you want the same characterization for all files? If not u
 		case $decision in
 			[yY]|[yY][eE][sS]|"")
 				read -r -p $'\t'"Thank you. What will be your characterization? You can choose multiple options, but must be comma separated (,) [t/d/a/n/m] " job
-                echo -e"\tThe job chosen for all the files was: $job" >> $1
+                echo -e "\tThe job chosen for all the files was: $job" >> $1
 				for ix in ${files[@]}; do
                     characterization $ix $output $job $1
 				done

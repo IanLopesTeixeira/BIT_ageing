@@ -109,7 +109,6 @@ elif [ "$multiple" == "each" ];
 then
 	if [ "$end" == "single" ];
     then
-		echo "yes2"
         files=$file_inp
         sep="."
     else

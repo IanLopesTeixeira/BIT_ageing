@@ -12,7 +12,7 @@ fi
 
 echo -e "\nHere we go:\n" | tee -a $1
 echo -e "\tBIT_id\tUsed for identification of BIT locations" | tee -a $1
-read -r -p $'\t'"What transcriptomes are you going to use for the identification of BIT's? If you use more than one transcriptome, please make them space separated ( ). The transcriptome(s) must be trimmed for only transcripts and unique TSS. If the trimming is not perform, both use the option available in this function and go to R script for TSS unique trimming " -a transcriptomes
+read -r -p $'\t'"What transcriptomes are you going to use for the identification of BIT's? If you use more than one transcriptome, please make them space separated ( ). The transcriptome(s) must be trimmed for only transcripts. If the trimming is not perform, use the option available in the main script for trimming (processing) " -a transcriptomes
 
 if [ -z "$transcriptomes" ];
 then
@@ -65,20 +65,24 @@ for ix in ${transcriptomes[@]}; do
     out=$(IFS=/ ; echo "${e[*]:0:$((${#e[@]}-1))}")
     if [ $model == "UPSTREAM" ];
     then
+        out+="/intersection_upstream"
+        mkdir $out
         echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools flank -i $ix -g $chr_sizes -s -l 42 -r 0 > ."$se".42_up."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools flank -i $ix -g $chr_sizes -s -l 42 -r 0 > ."$se".42_up."$form"
-        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".42_up."$form" -b $DSBome -wa -u > ."$out"/intersect_upstream_"$prefifx"."$form"" >> $1
+        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".42_up."$form" -b $DSBome -wa -u > "$out"/intersect_upstream_"$prefix"."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools intersect -a ."$se".42_up."$form" -b $DSBome -wa -u > "$out"/intersect_upstream_"$prefix"."$form"
-        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".42_up."$form" -b $DSBome -wa -wb > "$out"/intersect_upstream_"$prefifx"_w_dsb_info."$form"" >> $1
+        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".42_up."$form" -b $DSBome -wa -wb > "$out"/intersect_upstream_"$prefix"_w_dsb_info."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools intersect -a ."$se".42_up."$form" -b $DSBome -wa -wb > "$out"/intersect_upstream_"$prefix"_w_dsb_info."$form"
     else
+        out+="/intersection_hotspot"
+        mkdir $out
         echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools flank -i $ix -g $chr_sizes -s -l 1 -r 0 > ."$se".1_up."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools flank -i $ix -g $chr_sizes -s -l 1 -r 0 > ."$se".1_up."$form"
         echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools flank -i ."$se".1_up."$form" -g $chr_sizes -s -l 0 -r 1 > ."$se".tss."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools flank -i ."$se".1_up."$form" -g $chr_sizes -s -l 0 -r 1 > ."$se".tss."$form"
-        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".tss."$form" -b $DSBome -wa -u > "$out"/intersect_hotspot_"$prefifx"."$form"" >> $1
+        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".tss."$form" -b $DSBome -wa -u > "$out"/intersect_hotspot_"$prefix"."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools intersect -a ."$se".tss."$form" -b $DSBome -wa -u > "$out"/intersect_hotspot_"$prefix"."$form"
-        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".tss."$form" -b $DSBome -wa -wb > "$out"/intersect_hotspot_"$prefifx"_w_dsb_info."$form"" >> $1
+        echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD htstools bedtools intersect -a ."$se".tss."$form" -b $DSBome -wa -wb > "$out"/intersect_hotspot_"$prefix"_w_dsb_info."$form"" >> $1
         udocker -q run -v=$PWD:$PWD -w=$PWD htstools bedtools intersect -a ."$se".tss."$form" -b $DSBome -wa -wb > "$out"/intersect_hotspot_"$prefix"_w_dsb_info."$form"
     fi
 done

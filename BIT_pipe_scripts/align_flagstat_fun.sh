@@ -11,7 +11,7 @@ then
 fi
 
 echo -e "\nHere we go:\n" | tee -a $1
-echo -e "\talign_flagstat\tUsed to see some statistics about the alignment using samtools flagstat"
+echo -e "\talign_flagstat\tUsed to see some statistics about the alignment using samtools flagstat" | tee -a $1
 read -r -p $'\t'"Which is the file that is going to be analyzed? " file
 if [ -z "$file" ];
 then

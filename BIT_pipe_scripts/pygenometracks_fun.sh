@@ -31,7 +31,7 @@ fi
 
 echo -e "\tThe initial number is going to be $ini" >> $1
 
-read -r -p $'\t'"What would you like to name the folder to save the output(s)? " folder
+read -r -p $'\t'"What would you like to name the folder to save the output(s)? Give the full path of it (if it's not created, give the path you would like to create it, with the desired name of such folder) " folder
 
 if [ -z $folder ];
 then
@@ -87,6 +87,6 @@ for ix in $(seq $ini $num); do
         echo -e "\tSorry, but no region was provided. The program is going to terminate" | tee -a $1
         exit
     fi
-    echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD pygenometracks pyGenomeTracks --tracks $tracks --region $region --outFileName $output_img --dpi 300 --width 20 --fontSize 8" >> $1
-    udocker -q run -v=$PWD:$PWD -w=$PWD pygenometracks pyGenomeTracks --tracks $tracks --region $region --outFileName $output_img --dpi 300 --width 20 --fontSize 8
+    echo -e "\tudocker -q run -v=\$PWD:\$PWD -w=\$PWD pygenometracks pyGenomeTracks --tracks $tracks --region $region --outFileName $output_img --dpi 300 --width 30 --fontSize 7 --trackLabelFraction 0.001" >> $1
+    udocker -q run -v=$PWD:$PWD -w=$PWD pygenometracks pyGenomeTracks --tracks $tracks --region $region --outFileName $output_img --dpi 300 --width 30 --fontSize 7 --trackLabelFraction 0.001
 done
